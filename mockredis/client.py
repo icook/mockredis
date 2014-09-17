@@ -15,6 +15,7 @@ from mockredis.exceptions import RedisError, ResponseError
 from mockredis.pipeline import MockRedisPipeline
 from mockredis.script import Script
 from mockredis.sortedset import SortedSet
+from mockredis.total_size import total_size
 
 if sys.version_info >= (3, 0):
     long = int
@@ -241,6 +242,19 @@ class MockRedis(object):
             self.redis[new_key] = self.redis.pop(old_key)
             return True
         return False
+
+    def debug_object(self, key):
+        if key not in self.redis:
+            # as of redis 2.8, -2 returned if key does not exist
+            raise ResponseError("ERR no such key")
+
+        return {'encoding': 'raw',
+                'refcount': 1,
+                'lru_seconds_idle': 0,
+                'lru': 0,
+                'at': '0x7f76cb6c3cd0',
+                'serializedlength': total_size(self.redis[key]),
+                'type': 'Value'}
 
     #### String Functions ####
 
