@@ -160,12 +160,12 @@ class MockRedis(object):
 
     def expire(self, key, delta):
         """Emulate expire"""
-        delta = delta if isinstance(delta, timedelta) else timedelta(seconds=delta)
+        delta = delta if isinstance(delta, timedelta) else timedelta(seconds=int(delta))
         return self._expire(key, delta)
 
     def pexpire(self, key, milliseconds):
         """Emulate pexpire"""
-        return self._expire(key, timedelta(milliseconds=milliseconds))
+        return self._expire(key, timedelta(milliseconds=int(milliseconds)))
 
     def expireat(self, key, when):
         """Emulate expireat"""
@@ -293,9 +293,9 @@ class MockRedis(object):
         if self._should_set(key, mode):
             expire = None
             if ex is not None:
-                expire = ex if isinstance(ex, timedelta) else timedelta(seconds=ex)
+                expire = ex if isinstance(ex, timedelta) else timedelta(seconds=int(ex))
             if px is not None:
-                expire = px if isinstance(px, timedelta) else timedelta(milliseconds=px)
+                expire = px if isinstance(px, timedelta) else timedelta(milliseconds=int(px))
 
             if expire is not None and expire.total_seconds() <= 0:
                 raise ResponseError("invalid expire time in SETEX")
